@@ -16,22 +16,31 @@ import {
   OutdentIcon,
   IndentIcon,
   CopyIcon,
+  AlignLeftIcon,
+  AlignCenterIcon,
+  AlignRightIcon,
+  Heading3Icon,
 } from "outline-icons";
 import { EditorState } from "prosemirror-state";
 import { isInTable } from "prosemirror-tables";
 import * as React from "react";
+import isAttrActiveOnSelection from "@shared/editor/queries/isAttrActiveOnSelection";
 import isInCode from "@shared/editor/queries/isInCode";
 import isInList from "@shared/editor/queries/isInList";
 import isMarkActive from "@shared/editor/queries/isMarkActive";
 import isNodeActive from "@shared/editor/queries/isNodeActive";
 import { MenuItem } from "@shared/editor/types";
+import { Direction, TextAlign } from "@shared/types";
+import LtrIcon from "~/components/Icons/LtrIcon";
+import RtlIcon from "~/components/Icons/RtlIcon";
 import { Dictionary } from "~/hooks/useDictionary";
 
 export default function formattingMenuItems(
   state: EditorState,
   isTemplate: boolean,
   isMobile: boolean,
-  dictionary: Dictionary
+  dictionary: Dictionary,
+  isCommentEditor?: boolean
 ): MenuItem[] {
   const { schema } = state;
   const isTable = isInTable(state);
@@ -108,12 +117,69 @@ export default function formattingMenuItems(
       visible: allowBlocks && !isCode,
     },
     {
+      name: "heading",
+      tooltip: dictionary.subheading,
+      icon: <Heading3Icon />,
+      active: isNodeActive(schema.nodes.heading, { level: 3 }),
+      attrs: { level: 3 },
+      visible: allowBlocks && !isCode,
+    },
+    {
       name: "blockquote",
       tooltip: dictionary.quote,
       icon: <BlockQuoteIcon />,
       active: isNodeActive(schema.nodes.blockquote),
       attrs: { level: 2 },
       visible: allowBlocks && !isCode,
+    },
+    {
+      name: "separator",
+    },
+    {
+      name: "left_to_right",
+      tooltip: dictionary.leftToRight,
+      icon: <LtrIcon />,
+      active: isAttrActiveOnSelection({ attr: Direction.LTR, attrKey: "dir" }),
+    },
+    {
+      name: "right_to_left",
+      tooltip: dictionary.rightToLeft,
+      icon: <RtlIcon />,
+      active: isAttrActiveOnSelection({ attr: Direction.RTL, attrKey: "dir" }),
+    },
+    {
+      name: "separator",
+      visible: !isCommentEditor,
+    },
+    {
+      name: "align_left",
+      tooltip: dictionary.alignLeft,
+      icon: <AlignLeftIcon />,
+      visible: !isCommentEditor,
+      active: isAttrActiveOnSelection({
+        attr: TextAlign.Left,
+        attrKey: "textAlign",
+      }),
+    },
+    {
+      name: "align_center",
+      tooltip: dictionary.alignCenter,
+      icon: <AlignCenterIcon />,
+      visible: !isCommentEditor,
+      active: isAttrActiveOnSelection({
+        attr: TextAlign.Center,
+        attrKey: "textAlign",
+      }),
+    },
+    {
+      name: "align_right",
+      tooltip: dictionary.alignRight,
+      icon: <AlignRightIcon />,
+      visible: !isCommentEditor,
+      active: isAttrActiveOnSelection({
+        attr: TextAlign.Right,
+        attrKey: "textAlign",
+      }),
     },
     {
       name: "separator",

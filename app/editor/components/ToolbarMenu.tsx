@@ -120,7 +120,7 @@ function ToolbarMenu(props: Props) {
 
 const FlexibleWrapper = styled.div`
   color: ${s("textSecondary")};
-  overflow: hidden;
+  overflow: visible;
   display: flex;
   gap: 6px;
 `;
