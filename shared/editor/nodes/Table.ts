@@ -14,6 +14,8 @@ import {
   toggleHeaderRow,
 } from "prosemirror-tables";
 import { Decoration, DecorationSet } from "prosemirror-view";
+
+import { propertiesToInlineStyle } from "../../utils/dom";
 import {
   addRowAndMoveSelection,
   setColumnAttr,
@@ -35,15 +37,44 @@ export default class Table extends Node {
       tableRole: "table",
       isolating: true,
       group: "block",
-      parseDOM: [{ tag: "table" }],
-      toDOM() {
+      attrs: {
+        dir: {
+          default: null,
+        },
+        textAlign: {
+          default: null,
+        },
+      },
+      parseDOM: [
+        {
+          tag: "table",
+          getAttrs: (dom: HTMLLIElement) => ({
+            dir: dom.getAttribute("dir"),
+            textAlign: dom.style.textAlign,
+          }),
+        },
+      ],
+      toDOM(node) {
         return [
           "div",
-          { class: "scrollable-wrapper table-wrapper" },
+          {
+            class: "scrollable-wrapper table-wrapper",
+            dir: node.attrs.dir,
+          },
           [
             "div",
             { class: "scrollable" },
-            ["table", { class: "rme-table" }, ["tbody", 0]],
+            [
+              "table",
+              {
+                class: "rme-table",
+                dir: node.attrs.dir,
+                style: propertiesToInlineStyle({
+                  "text-align": node.attrs.textAlign,
+                }),
+              },
+              ["tbody", 0],
+            ],
           ],
         ];
       },
@@ -75,7 +106,7 @@ export default class Table extends Node {
     return {
       Tab: chainCommands(goToNextCell(1), addRowAndMoveSelection()),
       "Shift-Tab": goToNextCell(-1),
-      Enter: addRowAndMoveSelection(),
+      "Mod-Enter": addRowAndMoveSelection(),
     };
   }
 
