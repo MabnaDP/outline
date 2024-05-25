@@ -4,7 +4,6 @@ import styled, { DefaultTheme, css, keyframes } from "styled-components";
 import { videoStyle } from "./Video";
 
 export type Props = {
-  rtl: boolean;
   readOnly?: boolean;
   readOnlyWriteCheckboxes?: boolean;
   staticHTML?: boolean;
@@ -260,6 +259,11 @@ const emailStyle = (props: Props) => css`
     border-radius: 8px;
     padding: 6px 8px;
   }
+
+  .image > img {
+    width: auto;
+    height: auto;
+  }
 `;
 
 const style = (props: Props) => `
@@ -339,7 +343,9 @@ width: 100%;
     font-weight: 600;
     cursor: text;
 
-    & + p {
+    & + p,
+    // accounts for block insert trigger and other widgets between heading and paragraph
+    & + .ProseMirror-widget + p {
       margin-top: 0.25em;
     }
 
@@ -350,7 +356,7 @@ width: 100%;
       font-size: 13px;
       font-weight: 500;
       line-height: 0;
-      margin-${props.rtl ? "right" : "left"}: -24px;
+      margin-inline-start: -24px;
       transition: opacity 150ms ease-in-out;
       opacity: 0;
       width: 24px;
@@ -529,7 +535,6 @@ iframe.embed {
 
 .image-right-50 {
   float: right;
-  width: 33.3%;
   margin-left: 2em;
   margin-bottom: 1em;
   clear: initial;
@@ -537,7 +542,6 @@ iframe.embed {
 
 .image-left-50 {
   float: left;
-  width: 33.3%;
   margin-right: 2em;
   margin-bottom: 1em;
   clear: initial;
@@ -548,7 +552,7 @@ iframe.embed {
   max-width: 100vw;
   clear: both;
   position: initial;
-  ${props.rtl ? `margin-right: var(--offset)` : `margin-left: var(--offset)`};
+  margin-inline-start: var(--offset);
 
   img {
     max-width: 100vw;
@@ -586,8 +590,8 @@ li.ProseMirror-selectednode {
 li.ProseMirror-selectednode:after {
   content: "";
   position: absolute;
-  left: ${props.rtl ? "-2px" : "-32px"};
-  right: ${props.rtl ? "-32px" : "-2px"};
+  inset-inline-start: -32px;
+  inset-inline-end: -2px;
   top: -2px;
   bottom: -2px;
   border: 2px solid ${props.theme.selected};
@@ -691,7 +695,7 @@ h6:not(.placeholder):before {
 }
 
 .with-emoji {
-  margin-${props.rtl ? "right" : "left"}: -1em;
+  margin-inline-start: -1em;
 }
 
 .heading-anchor,
@@ -727,8 +731,8 @@ h6:not(.placeholder):before {
   opacity: 0;
   user-select: none;
   background: ${props.theme.background};
-  margin-${props.rtl ? "right" : "left"}: -26px;
-  flex-direction: ${props.rtl ? "row-reverse" : "row"};
+  margin-inline-start: -26px;
+  flex-direction: row;
   display: inline-flex;
   position: relative;
   top: -2px;
@@ -771,8 +775,12 @@ h6 {
 
   &.collapsed {
     svg {
-      transform: rotate(${props.rtl ? "90deg" : "-90deg"});
+      transform: rotate(-90deg);
       pointer-events: none;
+
+      &:dir(rtl) {
+        transform: rotate(90deg);
+      }
     }
     transition-delay: 0.1s;
     opacity: 1;
@@ -811,10 +819,13 @@ h6 {
   display: flex;
   align-items: center;
   background: ${transparentize(0.9, props.theme.noticeInfoBackground)};
-  border-left: 4px solid ${props.theme.noticeInfoBackground};
+  border-inline-start: 4px solid ${props.theme.noticeInfoBackground};
   color: ${props.theme.noticeInfoText};
   border-radius: 4px;
-  padding: 8px 10px 8px 8px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-inline-start: 8px;
+  padding-inline-end: 10px;
   margin: 8px 0;
 
   a {
@@ -843,13 +854,13 @@ h6 {
   width: 24px;
   height: 24px;
   align-self: flex-start;
-  margin-${props.rtl ? "left" : "right"}: 4px;
+  margin-inline-end: 4px;
   color: ${props.theme.noticeInfoBackground};
 }
 
 .notice-block.tip {
   background: ${transparentize(0.9, props.theme.noticeTipBackground)};
-  border-left: 4px solid ${props.theme.noticeTipBackground};
+  border-inline-start: 4px solid ${props.theme.noticeTipBackground};
   color: ${props.theme.noticeTipText};
 
   .icon {
@@ -863,7 +874,7 @@ h6 {
 
 .notice-block.warning {
   background: ${transparentize(0.9, props.theme.noticeWarningBackground)};
-  border-left: 4px solid ${props.theme.noticeWarningBackground};
+  border-inline-start: 4px solid ${props.theme.noticeWarningBackground};
   color: ${props.theme.noticeWarningText};
 
   .icon {
@@ -877,7 +888,7 @@ h6 {
 
 .notice-block.success {
   background: ${transparentize(0.9, props.theme.noticeSuccessBackground)};
-  border-left: 4px solid ${props.theme.noticeSuccessBackground};
+  border-inline-start: 4px solid ${props.theme.noticeSuccessBackground};
   color: ${props.theme.noticeSuccessText};
 
   .icon {
@@ -891,7 +902,10 @@ h6 {
 
 blockquote {
   margin: 0;
-  padding: 8px 10px 8px 1.5em;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  padding-inline-start: 1.5rem;
+  padding-inline-end: 10px;
   font-style: italic;
   overflow: hidden;
   position: relative;
@@ -902,7 +916,7 @@ blockquote {
     width: 2px;
     border-radius: 1px;
     position: absolute;
-    margin-${props.rtl ? "right" : "left"}: -1.5em;
+    margin-inline-start: -1.5em;
     top: 0;
     bottom: 0;
     background: ${props.theme.quote};
@@ -964,8 +978,14 @@ a:hover {
 
 ul,
 ol {
-  margin: ${props.rtl ? "0 -26px 0 0.1em" : "0 0.1em 0 -26px"};
-  padding: ${props.rtl ? "0 48px 0 0" : "0 0 0 48px"};
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-inline-start: -26px;
+  margin-inline-end: 0.1rem;
+  padding-inline-start: 48px;
+  padding-inline-end: 0;
 }
 
 ol ol {
@@ -978,8 +998,8 @@ ol ol ol {
 
 ul.checkbox_list {
   padding: 0;
-  margin-left: ${props.rtl ? "0" : "-24px"};
-  margin-right: ${props.rtl ? "-24px" : "0"};
+  margin-inline-start: -24px;
+  margin-inline-end: 0;
 }
 
 ul li,
@@ -999,7 +1019,7 @@ ol li {
 ul.checkbox_list > li {
   display: flex;
   list-style: none;
-  padding-${props.rtl ? "right" : "left"}: 24px;
+  padding-inline-start: 24px;
 }
 
 ul.checkbox_list > li.checked > div > p {
@@ -1016,7 +1036,7 @@ ol li::before {
   width: 24px;
   height: 24px;
   position: absolute;
-  ${props.rtl ? "right" : "left"}: -40px;
+  inset-inline-start: -40px;
   opacity: 0;
   transition: opacity 200ms ease-in-out;
 }
@@ -1028,7 +1048,7 @@ ol li[draggable=true]::before {
 
 ul > li.counter-2::before,
 ol li.counter-2::before {
-  ${props.rtl ? "right" : "left"}: -50px;
+  inset-inline-start: -50px;
 }
 
 ul > li.hovering::before,
@@ -1042,7 +1062,7 @@ ol li.ProseMirror-selectednode::after {
 }
 
 ul.checkbox_list > li::before {
-  ${props.rtl ? "right" : "left"}: 0;
+  inset-inline-start: 0;
 }
 
 ul.checkbox_list li .checkbox {
@@ -1052,7 +1072,10 @@ ul.checkbox_list li .checkbox {
     props.readOnly && !props.readOnlyWriteCheckboxes ? "none" : "initial"
   };
   opacity: ${props.readOnly && !props.readOnlyWriteCheckboxes ? 0.75 : 1};
-  margin: ${props.rtl ? "0 0 0 0.5em" : "0 0.5em 0 0"};
+  margin-bottom: 0;
+  margin-top: 0;
+  margin-inline-end: 0.5em;
+  margin-inline-start: 0;
   width: 14px;
   height: 14px;
   position: relative;
@@ -1298,7 +1321,7 @@ table {
     border: 1px solid ${props.theme.tableDivider};
     position: relative;
     padding: 4px 8px;
-    text-align: ${props.rtl ? "right" : "left"};
+    text-align: start;
     min-width: 100px;
   }
 
@@ -1326,7 +1349,7 @@ table {
       cursor: var(--pointer);
       position: absolute;
       top: -16px;
-      ${props.rtl ? "right" : "left"}: 0;
+      inset-inline-start: 0;
       width: 100%;
       height: 12px;
       background: ${props.theme.tableDivider};
@@ -1338,10 +1361,10 @@ table {
       background: ${props.theme.text};
     }
     &.first::after {
-      border-top-${props.rtl ? "right" : "left"}-radius: 3px;
+      border-start-start-radius: 3px;
     }
     &.last::after {
-      border-top-${props.rtl ? "left" : "right"}-radius: 3px;
+      border-start-end-radius: 3px;
     }
     &.selected::after {
       background: ${props.theme.tableSelected};
@@ -1353,12 +1376,12 @@ table {
       content: "";
       cursor: var(--pointer);
       position: absolute;
-      ${props.rtl ? "right" : "left"}: -16px;
+      inset-inline-start: -16px;
       top: 0;
       height: 100%;
       width: 12px;
       background: ${props.theme.tableDivider};
-      border-${props.rtl ? "left" : "right"}: 3px solid;
+      border-inline-end: 3px solid;
       border-color: ${props.theme.background};
       display: ${props.readOnly ? "none" : "block"};
     }
@@ -1367,10 +1390,10 @@ table {
       background: ${props.theme.text};
     }
     &.first::after {
-      border-top-${props.rtl ? "right" : "left"}-radius: 3px;
+      border-start-start-radius: 3px;
     }
     &.last::after {
-      border-bottom-${props.rtl ? "right" : "left"}-radius: 3px;
+      border-end-start-radius: 3px;
     }
     &.selected::after {
       background: ${props.theme.tableSelected};
@@ -1388,7 +1411,7 @@ table {
       border: 2px solid ${props.theme.background};
       position: absolute;
       top: -18px;
-      ${props.rtl ? "right" : "left"}: -18px;
+      inset-inline-start: -18px;
       display: ${props.readOnly ? "none" : "block"};
     }
 
@@ -1437,8 +1460,8 @@ table {
 .scrollable {
   overflow-y: hidden;
   overflow-x: auto;
-  padding-${props.rtl ? "right" : "left"}: 1em;
-  margin-${props.rtl ? "right" : "left"}: -1em;
+  padding-inline-start: 1em;
+  margin-inline-start: -1em;
   transition: border 250ms ease-in-out 0s;
 }
 
@@ -1446,7 +1469,7 @@ table {
   position: absolute;
   top: 16px;
   bottom: 0;
-  ${props.rtl ? "right" : "left"}: -1em;
+  inset-inline-start: -1em;
   width: 32px;
   z-index: 1;
   transition: box-shadow 250ms ease-in-out;
@@ -1484,7 +1507,7 @@ table {
   border: 0;
   padding: 0;
   margin-top: 1px;
-  margin-${props.rtl ? "right" : "left"}: -28px;
+  margin-inline-start: -28px;
   border-radius: 4px;
 
   &:hover,

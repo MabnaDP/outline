@@ -39,8 +39,8 @@ import { basicExtensions as extensions } from "@shared/editor/nodes";
 import Node from "@shared/editor/nodes/Node";
 import ReactNode from "@shared/editor/nodes/ReactNode";
 import { EventType } from "@shared/editor/types";
-import { UserPreferences } from "@shared/types";
-import ProsemirrorHelper from "@shared/utils/ProsemirrorHelper";
+import { ProsemirrorData, UserPreferences } from "@shared/types";
+import { ProsemirrorHelper } from "@shared/utils/ProsemirrorHelper";
 import EventEmitter from "@shared/utils/events";
 import Flex from "~/components/Flex";
 import { PortalContext } from "~/components/Portal";
@@ -59,7 +59,7 @@ export type Props = {
   /** The user id of the current user */
   userId?: string;
   /** The editor content, should only be changed if you wish to reset the content */
-  value?: string;
+  value?: string | ProsemirrorData;
   /** The initial editor content as a markdown string or JSON object */
   defaultValue: string | object;
   /** Placeholder displayed when the editor is empty */
@@ -132,6 +132,7 @@ export type Props = {
   style?: React.CSSProperties;
   /** Optional style overrides for the contenteeditable */
   editorStyle?: React.CSSProperties;
+  isCommentEditor?: boolean;
 };
 
 type State = {
@@ -730,8 +731,16 @@ export class Editor extends React.PureComponent<
   };
 
   public render() {
-    const { dir, readOnly, canUpdate, grow, style, className, onKeyDown } =
-      this.props;
+    const {
+      dir,
+      readOnly,
+      canUpdate,
+      grow,
+      style,
+      className,
+      onKeyDown,
+      isCommentEditor,
+    } = this.props;
     const { isRTL } = this.state;
 
     return (
@@ -748,7 +757,6 @@ export class Editor extends React.PureComponent<
           >
             <EditorContainer
               dir={dir}
-              rtl={isRTL}
               grow={grow}
               readOnly={readOnly}
               readOnlyWriteCheckboxes={canUpdate}
@@ -761,6 +769,7 @@ export class Editor extends React.PureComponent<
             {this.view && (
               <SelectionToolbar
                 rtl={isRTL}
+                isCommentEditor={isCommentEditor}
                 readOnly={readOnly}
                 canUpdate={this.props.canUpdate}
                 canComment={this.props.canComment}

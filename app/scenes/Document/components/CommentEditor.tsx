@@ -30,7 +30,13 @@ const CommentEditor = (
   const user = useCurrentUser({ rejectOnEmpty: false });
 
   return (
-    <Editor extensions={extensions} userId={user?.id} {...props} ref={ref} />
+    <Editor
+      extensions={extensions}
+      userId={user?.id}
+      {...props}
+      ref={ref}
+      isCommentEditor
+    />
   );
 };
 

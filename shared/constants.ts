@@ -28,3 +28,19 @@ export const UserPreferenceDefaults: UserPreferences = {
   [UserPreference.UseCursorPointer]: true,
   [UserPreference.CodeBlockLineNumers]: true,
 };
+
+export const NodesWithTextDirAlignSupport = [
+  "container_notice",
+  "th",
+  "td",
+  "table",
+  "paragraph",
+  "ordered_list",
+  "list_item",
+  "heading",
+  "checkbox_item",
+  "checkbox_list",
+  "bullet_list",
+  "blockquote",
+  "attachment",
+];
